@@ -16,6 +16,10 @@ export namespace Types {
   export type Message = GeneralDiscordTypes.Message;
   export type SendMessageOptionsForReply = SendMessageOptionsForReplyType;
   export type CloudUpload = typeof CloudUploadType;
+  export interface ASTNode extends React.ReactElement {
+    type: string;
+    content?: string | ASTNode[];
+  }
   export interface IconUtils {
     getAnimatableSourceWithFallback: DefaultTypes.AnyFunction;
     getApplicationIconSource: DefaultTypes.AnyFunction;
@@ -55,11 +59,27 @@ export namespace Types {
   export interface PendingReplyStore extends Store {
     getPendingReply: (channelId: string) => SendMessageForReplyOptions;
   }
+  export interface PermissionUtils {
+    applyThreadPermissions?: DefaultTypes.AnyFunction;
+    areChannelsLocked?: DefaultTypes.AnyFunction;
+    can: DefaultTypes.AnyFunction;
+    canEveryone?: DefaultTypes.AnyFunction;
+    canEveryoneRole?: DefaultTypes.AnyFunction;
+    canManageACategory?: DefaultTypes.AnyFunction;
+    computePermissions?: DefaultTypes.AnyFunction;
+    computePermissionsForRoles?: DefaultTypes.AnyFunction;
+    getGuildVisualOwnerId?: DefaultTypes.AnyFunction;
+    getHighestHoistedRole?: DefaultTypes.AnyFunction;
+    getHighestRole?: DefaultTypes.AnyFunction;
+    isRoleHigher?: DefaultTypes.AnyFunction;
+    makeEveryoneOverwrite?: DefaultTypes.AnyFunction;
+  }
   export interface Modules {
     loadModules?: () => Promise<void>;
     CloudUpload?: CloudUpload;
     IconUtils?: IconUtils;
     PendingReplyStore?: PendingReplyStore;
+    PermissionUtils?: PermissionUtils;
   }
 }
 export default Types;

@@ -6,6 +6,10 @@ import {
 import Types from "../types";
 import Modules from "./requiredModules";
 import { PluginLogger } from "..";
+import { webpack } from "replugged";
+
+export const isObject = (testMaterial: unknown): boolean =>
+  typeof testMaterial === "object" && !Array.isArray(testMaterial) && testMaterial != null;
 
 const generateQuote = ({
   avatarUrl,
@@ -67,14 +71,22 @@ const generateQuote = ({
       const centerY = height / 2;
 
       // seperate text into lines based on width
-      const { lines, line } = text.split(" ").reduce(
-        ({ lines, line }, word) => {
-          const newLine = `${line}${word} `;
+      const chars = text.split("");
+      const { lines, line } = chars.reduce(
+        ({ lines, line }, char, i) => {
+          const newLine = `${line}${char}`;
           const lineWidth = canvasContext.measureText(newLine).width;
 
-          return lineWidth > textWidth && line
-            ? { lines: [...lines, line.trim()], line: `${word}  ` }
-            : { lines, line: newLine };
+          if (lineWidth > textWidth && line) {
+            const spaceIndex = line.lastIndexOf(" ");
+            if (chars[i] !== " " && chars[i + 1] !== " " && spaceIndex !== -1)
+              return {
+                lines: [...lines, line.slice(0, spaceIndex).trim()],
+                line: `${line.slice(spaceIndex + 1)}${char}`,
+              };
+            return { lines: [...lines, line.trim()], line: `${char}` };
+          }
+          return { lines, line: newLine };
         },
         { lines: [], line: "" },
       );
@@ -122,29 +134,24 @@ export const timestampToSnowflake = (timestamp: number): string => {
 };
 
 export const sendQuote = async ({
-  message,
+  avatarUrl,
+  author,
+  content,
   channel,
   size = 1024,
 }: {
-  message: Types.Message;
+  avatarUrl: string;
+  author: string;
+  content: string;
   channel: Types.Channel;
   size?: number;
 }) => {
-  const { IconUtils, CloudUpload, PendingReplyStore } = Modules;
-  const avatarUrl = IconUtils.getUserAvatarURL(
-    {
-      id: message?.author?.id,
-      avatar: message?.author?.avatar,
-    },
-    true,
-    size,
-    "png",
-  );
+  const { CloudUpload, PendingReplyStore } = Modules;
 
   const QuoteImg = await generateQuote({
     avatarUrl,
-    text: message.content,
-    author: message?.author.username,
+    text: content,
+    author,
     size,
   }).catch((...args) => {
     PluginLogger.error("Failed to generate quote", ...args);
@@ -201,4 +208,72 @@ export const sendQuote = async ({
     });
 };
 
-export default { generateQuote, timestampToSnowflake, sendQuote };
+export const unmangleExports = <T>(
+  moduleFilter: Types.DefaultTypes.Filter | Types.DefaultTypes.RawModule,
+  map: Record<string, string | string[] | RegExp | Types.DefaultTypes.AnyFunction>,
+): T => {
+  const getExportKeyFinder = (
+    mapValue: string | string[] | RegExp | Types.DefaultTypes.AnyFunction,
+  ): Types.DefaultTypes.AnyFunction => {
+    if (typeof mapValue === "function") {
+      return (mod: Types.DefaultTypes.RawModule["exports"]) => {
+        return mapValue(mod);
+      };
+    }
+
+    if (Array.isArray(mapValue)) {
+      return (mod: Types.DefaultTypes.RawModule["exports"]) => {
+        if (!isObject(mod)) return "";
+        for (const [k, exported] of Object.entries(mod)) {
+          if (mapValue.every((p) => Object.hasOwnProperty.call(exported, p))) return k;
+        }
+      };
+    }
+
+    return (mod: Types.DefaultTypes.RawModule["exports"]) =>
+      webpack.getFunctionKeyBySource(mod, mapValue as string);
+  };
+
+  const mod: Types.DefaultTypes.RawModule =
+    typeof moduleFilter === "function"
+      ? webpack.getModule(moduleFilter, { raw: true })
+      : moduleFilter;
+
+  if (!mod) return {} as T;
+
+  const unmangled = {} as T;
+
+  for (const key in map) {
+    const findKey = getExportKeyFinder(map[key]);
+    const valueKey = findKey(mod.exports) as string;
+    Object.defineProperty(unmangled, key, {
+      get: () => mod.exports[valueKey],
+      set: (v) => {
+        mod.exports[valueKey] = v;
+      },
+    });
+  }
+
+  return unmangled;
+};
+
+export const extractTextFromAst = (node: Types.ASTNode | Types.ASTNode[]): string => {
+  if (node == null) return "";
+
+  if (Array.isArray(node)) return node.map(extractTextFromAst).join("");
+
+  if (typeof node !== "object") return "";
+
+  if (node.type === "text" && typeof node.content === "string") return node.content;
+
+  if (typeof node.content !== "string") return extractTextFromAst(node.content);
+};
+
+export default {
+  isObject,
+  generateQuote,
+  timestampToSnowflake,
+  sendQuote,
+  unmangleExports,
+  extractTextFromAst,
+};
