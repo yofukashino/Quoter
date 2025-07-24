@@ -1,13 +1,13 @@
 {
-  "name": "plugin-template",
+  "name": "quoter",
   "version": "1.0.0",
-  "description": "A plugin template",
-  "license": "ISC",
+  "description": "Quote your friends wild statements.",
+  "license": "GNU v3",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=10.0.0"
   },
-  "author": "",
+  "author": "Nanakusa",
   "scripts": {
     "build": "replugged build plugin",
     "watch": "replugged build plugin --watch",
@@ -22,14 +22,17 @@
     "lint:fix": "pnpm run prettier:fix && pnpm run eslint:fix"
   },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "@types/node": "^22.14.1",
-    "eslint": "^9.25.0",
-    "eslint-plugin-react": "^7.37.5",
-    "globals": "^16.0.0",
-    "prettier": "^3.5.3",
-    "replugged": "^4.9.1",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.30.1"
+    "@types/node": "^18.17.18",
+    "@types/react": "^18.3.3",
+    "discord-types": "^1.3.3",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.49.0",
+    "eslint-config-dmitmel": "github:dmitmel/eslint-config-dmitmel",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-react": "^7.33.2",
+    "prettier": "^2.8.8",
+    "replugged": "^4.10.0",
+    "typescript": "^5.0.0"
   }
 }

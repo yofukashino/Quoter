@@ -1,20 +1,26 @@
 {
-  "id": "dev.replugged.PluginTemplate",
-  "name": "Plugin Template",
-  "description": "A plugin template",
-  "author": {
-    "name": "replugged",
-    "discordID": "1000992611840049192",
-    "github": "replugged-org"
-  },
+  "id": "dev.yofukashino.Quoter",
+  "name": "Quoter",
+  "description": "Quote your friends wild statements.",
+   "author": [    
+    {
+      "name": "Nanakusa",
+      "discordID": "1121961711080050780",
+      "github": "yofukashino"
+    },
+    {
+      "name": "Stupid",
+      "discordID": "917630027477159986",
+      "github": "zrodevkaan"
+    }
+  ],
   "version": "1.0.0",
   "updater": {
-    "type": "github",
-    "id": "replugged-org/plugin-template"
+    "type": "store",
+    "id": "dev.yofukashino.QuoterC"
   },
   "license": "MIT",
   "type": "replugged-plugin",
   "renderer": "src/index.ts",
-  "source": "https://github.com/replugged-org/plugin-template",
-  "image": ["https://i.imgur.com/14CNs3a.png?CHANGE-THIS-URL"]
+  "source": "https://github.com/yofukashino/Quoter"
 }
