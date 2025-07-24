@@ -19,6 +19,7 @@ const generateQuote = ({
   size?: number;
 }) => {
   return new Promise<Blob>((resolve, reject) => {
+    text = `"${text}"`;
     const canvas = document.createElement("canvas");
     const height = size;
     // cinematic screen ratio for width
@@ -41,31 +42,25 @@ const generateQuote = ({
       canvasContext.fillRect(0, 0, width, height);
 
       // 25 for padding
-      const textWidth = width - avatarWidth - 25;
+      const textWidth = (width - avatarWidth) * 0.75;
 
       const charCount = text.length;
       // we use half the size to begin with
       // 0.6 based of arial
       // get the max size we can use for width
-      const fontSizeForWidth = (textWidth / charCount) * 0.6;
+      const fontArea = 0.6;
 
-      // charCount * 0.6 = char count by font * fontsize by width
-      // divived by width to give lines?
-      const estimatedLines = (charCount * 0.6 * fontSizeForWidth) / width;
-      // 1.2  lineheight based of arial
-      // get the max size we can use based of height
-      const fontSizeForHeight = height / (estimatedLines * 1.2);
+      const textArea = textWidth * height;
 
-      // height will mostly be bigger unless too many lines but we pick smaller incase
-      const baseSize = Math.min(fontSizeForWidth, fontSizeForHeight);
+      // scale font size based on square root of area per char
+      const baseSize = Math.sqrt((textArea / charCount) * fontArea);
 
-      // max size between 1 / 60
-      const fontSize = Math.max(1, Math.min(baseSize, 60)) * 1.3;
+      const fontSize = Math.max(1, Math.min(baseSize, 60));
 
       const lineHeight = fontSize * 1.2;
 
       canvasContext.fillStyle = "white";
-      canvasContext.font = `bold ${fontSize * 1.4}px Arial`;
+      canvasContext.font = `bold ${fontSize}px Arial`;
 
       // center of the whole image
       const centerX = width / 2;
@@ -78,7 +73,7 @@ const generateQuote = ({
           const lineWidth = canvasContext.measureText(newLine).width;
 
           return lineWidth > textWidth && line
-            ? { lines: [...lines, line.trim()], line: word + " " }
+            ? { lines: [...lines, line.trim()], line: `${word}  ` }
             : { lines, line: newLine };
         },
         { lines: [], line: "" },
@@ -151,8 +146,11 @@ export const sendQuote = async ({
     text: message.content,
     author: message?.author.username,
     size,
+  }).catch((...args) => {
+    PluginLogger.error("Failed to generate quote", ...args);
+    Toast.toast("Failed to generate quote", Toast.Kind.FAILURE);
   });
-
+  if (!QuoteImg) return;
   const replyOptions: Types.SendMessageOptionsForReply =
     UltimateMessageStore.getSendMessageOptionsForReply(
       PendingReplyStore.getPendingReply(channel.id),
@@ -185,8 +183,8 @@ export const sendQuote = async ({
   };
 
   const failed = (...args): void => {
-    PluginLogger.error("Failed to upload voice message", ...args);
-    Toast.toast("Failed to upload voice message", Toast.Kind.FAILURE);
+    PluginLogger.error("Failed to upload quote", ...args);
+    Toast.toast("Failed to upload quote", Toast.Kind.FAILURE);
     UltimateMessageStore.clearChannel(channel.id);
   };
 
@@ -199,8 +197,7 @@ export const sendQuote = async ({
       onAttachmentUploadError: failed,
       ...messagePayload,
     }).then(() => {
-      if (cloudUpload._aborted)
-        Toast.toast("Successfully uploaded voice message", Toast.Kind.SUCCESS);
+      if (cloudUpload._aborted) Toast.toast("Successfully uploaded quote", Toast.Kind.SUCCESS);
     });
 };
 
