@@ -13,7 +13,7 @@ Install Link:
 
 ## Credits
 
-ALL CREDITS GO TO [Zrodevkaan](https://github.com/zrodevkaan) (Almost)
+(Almost) All credit goes to [Zrodevkaan](https://github.com/zrodevkaan) 
 
 
 ---
