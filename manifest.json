@@ -2,7 +2,7 @@
   "id": "dev.yofukashino.Quoter",
   "name": "Quoter",
   "description": "Quote your friends wild statements.",
-   "author": [    
+  "author": [
     {
       "name": "Nanakusa",
       "discordID": "1121961711080050780",
@@ -22,5 +22,6 @@
   "license": "MIT",
   "type": "replugged-plugin",
   "renderer": "src/index.ts",
-  "source": "https://github.com/yofukashino/Quoter"
+  "source": "https://github.com/yofukashino/Quoter",
+  "image": "https://raw.githubusercontent.com/yofukashino/Quoter/a6978d35118016706cfda0bf15390587e1cc9c08/assets/preview.png"
 }
