@@ -85,7 +85,7 @@ export default (): void => {
           });
           return;
         }
-        if (!noPermissions)
+        if (noPermissions)
           Toast.toast("Lacks Permission to send the quote here.", Toast.Kind.FAILURE);
         const imgBlob = await Utils.generateQuote({ avatarUrl, text: content, author, size: size });
         const imgUrl = URL.createObjectURL(imgBlob);
