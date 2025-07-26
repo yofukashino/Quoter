@@ -6,10 +6,9 @@ export const Modules: Types.Modules = {};
 
 Modules.loadModules = async (): Promise<void> => {
   Modules.CloudUpload = await webpack
-    .waitForModule(webpack.filters.bySource("uploadFileToCloud"), {
+    .waitForPrototype<Types.CloudUpload>(["uploadFileToCloud"], {
       timeout: 10000,
     })
-    .then((mod) => webpack.getFunctionBySource<Types.CloudUpload>(mod, "uploadFileToCloud"))
     .catch(() => {
       throw new Error("Failed To Find CloudUpload Module");
     });

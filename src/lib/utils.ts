@@ -264,7 +264,7 @@ export const extractTextFromAst = (node: Types.ASTNode | Types.ASTNode[]): strin
 
   if (typeof node !== "object") return "";
 
-  if (node.type === "text" && typeof node.content === "string") return node.content;
+  if (typeof node.content === "string") return node.content;
 
   if (typeof node.content !== "string") return extractTextFromAst(node.content);
 };

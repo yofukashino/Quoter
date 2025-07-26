@@ -15,7 +15,7 @@ export namespace Types {
   export type User = GeneralDiscordTypes.User;
   export type Message = GeneralDiscordTypes.Message;
   export type SendMessageOptionsForReply = SendMessageOptionsForReplyType;
-  export type CloudUpload = typeof CloudUploadType;
+  export type CloudUpload = typeof CloudUploadType & (typeof CloudUploadType)["prototype"];
   export interface ASTNode extends React.ReactElement {
     type: string;
     content?: string | ASTNode[];

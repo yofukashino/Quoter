@@ -1,4 +1,8 @@
-import { users as UltimateUserStore, constants as DiscordConstants } from "replugged/common";
+import {
+  users as UltimateUserStore,
+  constants as DiscordConstants,
+  toast as Toast,
+} from "replugged/common";
 import { ContextMenu } from "replugged/components";
 import { PluginInjectorUtils, PluginLogger } from "../index";
 import Modules from "../lib/requiredModules";
@@ -15,7 +19,7 @@ export default (): void => {
         name: "avatar",
         displayName: "Avatar url",
         description: "Link of avatar of the person you are quoting",
-        type: Types.DefaultTypes.ApplicationCommandOptionType.String,
+        type: Types.DefaultTypes.ApplicationCommandOptionType.Attachment,
         required: true,
       },
       {
@@ -49,13 +53,29 @@ export default (): void => {
     ],
     executor: async (interaction) => {
       try {
-        const avatarUrl = interaction.getValue("avatar");
+        const avatarFile = interaction.getValue("avatar").file;
+        if (!avatarFile.type.startsWith("image")) {
+          return { send: false, content: "Please Select a valid image instead." };
+        }
+        const avatarUrl = URL.createObjectURL(interaction.getValue("avatar").file);
         const author = interaction.getValue("name");
         const content = interaction.getValue("quote");
+        const size = interaction.getValue("size", 1024);
         const channel = interaction.channel;
-        const size = interaction.getValue("size") ?? 1024;
-
-        if (interaction.getValue("send")) {
+        const user = UltimateUserStore.getCurrentUser();
+        const noPermissions =
+          channel.getGuildId() &&
+          !PermissionUtils.can({
+            permission: DiscordConstants.Permissions.SEND_MESSAGES,
+            context: channel,
+            user,
+          }) &&
+          !PermissionUtils.can({
+            permission: DiscordConstants.Permissions.ATTACH_FILES,
+            context: channel,
+            user,
+          });
+        if (interaction.getValue("send", true) && !noPermissions) {
           Utils.sendQuote({
             avatarUrl,
             author,
@@ -65,6 +85,8 @@ export default (): void => {
           });
           return;
         }
+        if (!noPermissions)
+          Toast.toast("Lacks Permission to send the quote here.", Toast.Kind.FAILURE);
         const imgBlob = await Utils.generateQuote({ avatarUrl, text: content, author, size: size });
         const imgUrl = URL.createObjectURL(imgBlob);
         return {
@@ -72,19 +94,10 @@ export default (): void => {
           embeds: [
             {
               image: {
-                contentType: "image/png",
-                flags: 0,
-                placeholderVersion: 1,
                 url: imgUrl,
-                proxyURL: imgUrl,
                 width: (21 / 9) * size,
                 height: size,
               },
-              contentScanVersion: 2,
-              fields: [],
-              flags: undefined,
-              type: "image",
-              url: imgUrl,
             },
           ],
         };
