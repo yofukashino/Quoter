@@ -1,9 +1,8 @@
 import {
-  users as UltimateUserStore,
   constants as DiscordConstants,
   toast as Toast,
+  users as UltimateUserStore,
 } from "replugged/common";
-import { ContextMenu } from "replugged/components";
 import { PluginInjectorUtils, PluginLogger } from "../index";
 import Modules from "../lib/requiredModules";
 import Utils from "../lib/utils";
@@ -61,7 +60,7 @@ export default (): void => {
         const author = interaction.getValue("name");
         const content = interaction.getValue("quote");
         const size = interaction.getValue("size", 1024);
-        const channel = interaction.channel;
+        const { channel } = interaction;
         const user = UltimateUserStore.getCurrentUser();
         const noPermissions =
           channel.getGuildId() &&
@@ -76,7 +75,7 @@ export default (): void => {
             user,
           });
         if (interaction.getValue("send", true) && !noPermissions) {
-          Utils.sendQuote({
+          await Utils.sendQuote({
             avatarUrl,
             author,
             content,
@@ -87,7 +86,7 @@ export default (): void => {
         }
         if (noPermissions)
           Toast.toast("Lacks Permission to send the quote here.", Toast.Kind.FAILURE);
-        const imgBlob = await Utils.generateQuote({ avatarUrl, text: content, author, size: size });
+        const imgBlob = await Utils.generateQuote({ avatarUrl, text: content, author, size });
         const imgUrl = URL.createObjectURL(imgBlob);
         return {
           send: false,

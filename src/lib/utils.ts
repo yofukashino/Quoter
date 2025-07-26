@@ -1,7 +1,7 @@
 import {
-  messages as UltimateMessageStore,
   fluxDispatcher as FluxDispatcher,
   toast as Toast,
+  messages as UltimateMessageStore,
 } from "replugged/common";
 import Types from "../types";
 import Modules from "./requiredModules";
@@ -21,7 +21,7 @@ const generateQuote = ({
   text: string;
   author: string;
   size?: number;
-}) => {
+}): Promise<Blob> => {
   return new Promise<Blob>((resolve, reject) => {
     text = `"${text}"`;
     const canvas = document.createElement("canvas");
@@ -145,7 +145,7 @@ export const sendQuote = async ({
   content: string;
   channel: Types.Channel;
   size?: number;
-}) => {
+}): Promise<void> => {
   const { CloudUpload, PendingReplyStore } = Modules;
 
   const QuoteImg = await generateQuote({
