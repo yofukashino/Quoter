@@ -1,6 +1,6 @@
 import {
-  users as UltimateUserStore,
   constants as DiscordConstants,
+  users as UltimateUserStore,
   parser,
 } from "replugged/common";
 import { ContextMenu } from "replugged/components";
@@ -29,7 +29,7 @@ export default (): void => {
             user,
           }))
       )
-        return;
+        return null;
 
       const content = Utils.extractTextFromAst(parser.parseToAST(message.content) as Types.ASTNode);
 

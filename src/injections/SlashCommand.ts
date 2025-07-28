@@ -16,8 +16,8 @@ export default (): void => {
     options: [
       {
         name: "avatar",
-        displayName: "Avatar url",
-        description: "Link of avatar of the person you are quoting",
+        displayName: "Avatar",
+        description: "Avatar of the person you are quoting",
         type: Types.DefaultTypes.ApplicationCommandOptionType.Attachment,
         required: true,
       },
@@ -43,6 +43,13 @@ export default (): void => {
         required: false,
       },
       {
+        name: "grayscale",
+        displayName: "Grayscale",
+        description: "Make the quote grayscale",
+        type: Types.DefaultTypes.ApplicationCommandOptionType.Boolean,
+        required: false,
+      },
+      {
         name: "send",
         displayName: "Send",
         description: "Share the quote publicly in chat",
@@ -60,6 +67,7 @@ export default (): void => {
         const author = interaction.getValue("name");
         const content = interaction.getValue("quote");
         const size = interaction.getValue("size", 1024);
+        const grayscale = interaction.getValue("grayscale", false);
         const { channel } = interaction;
         const user = UltimateUserStore.getCurrentUser();
         const noPermissions =
@@ -81,12 +89,19 @@ export default (): void => {
             content,
             channel,
             size,
+            grayscale,
           });
           return;
         }
         if (noPermissions)
           Toast.toast("Lacks Permission to send the quote here.", Toast.Kind.FAILURE);
-        const imgBlob = await Utils.generateQuote({ avatarUrl, text: content, author, size });
+        const imgBlob = await Utils.generateQuote({
+          avatarUrl,
+          text: content,
+          author,
+          size,
+          grayscale,
+        });
         const imgUrl = URL.createObjectURL(imgBlob);
         return {
           send: false,

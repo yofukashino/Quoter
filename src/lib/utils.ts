@@ -16,11 +16,13 @@ const generateQuote = ({
   text,
   author,
   size = 1024,
+  grayscale,
 }: {
   avatarUrl: string;
   text: string;
   author: string;
   size?: number;
+  grayscale?: boolean;
 }): Promise<Blob> => {
   return new Promise<Blob>((resolve, reject) => {
     text = `"${text}"`;
@@ -31,6 +33,7 @@ const generateQuote = ({
     canvas.width = width;
     canvas.height = height;
     const canvasContext = canvas.getContext("2d");
+    if (grayscale) canvasContext.filter = "grayscale(1)";
 
     const img = new Image();
 
@@ -139,12 +142,14 @@ export const sendQuote = async ({
   content,
   channel,
   size = 1024,
+  grayscale,
 }: {
   avatarUrl: string;
   author: string;
   content: string;
   channel: Types.Channel;
   size?: number;
+  grayscale?: boolean;
 }): Promise<void> => {
   const { CloudUpload, PendingReplyStore } = Modules;
 
@@ -153,6 +158,7 @@ export const sendQuote = async ({
     text: content,
     author,
     size,
+    grayscale,
   }).catch((...args) => {
     PluginLogger.error("Failed to generate quote", ...args);
     Toast.toast("Failed to generate quote", Toast.Kind.FAILURE);
