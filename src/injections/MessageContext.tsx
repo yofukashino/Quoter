@@ -23,11 +23,11 @@ export default (): void => {
             context: channel,
             user,
           }) ||
-          !PermissionUtils.can({
-            permission: DiscordConstants.Permissions.ATTACH_FILES,
-            context: channel,
-            user,
-          })))
+            !PermissionUtils.can({
+              permission: DiscordConstants.Permissions.ATTACH_FILES,
+              context: channel,
+              user,
+            })))
       )
         return null;
 
