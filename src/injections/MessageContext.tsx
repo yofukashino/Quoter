@@ -18,16 +18,16 @@ export default (): void => {
       if (
         !message.content ||
         (channel.getGuildId() &&
-          !PermissionUtils.can({
+          (!PermissionUtils.can({
             permission: DiscordConstants.Permissions.SEND_MESSAGES,
             context: channel,
             user,
-          }) &&
+          }) ||
           !PermissionUtils.can({
             permission: DiscordConstants.Permissions.ATTACH_FILES,
             context: channel,
             user,
-          }))
+          })))
       )
         return null;
 

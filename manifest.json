@@ -17,7 +17,7 @@
   "version": "1.0.0",
   "updater": {
     "type": "store",
-    "id": "dev.yofukashino.QuoterC"
+    "id": "dev.yofukashino.Quoter"
   },
   "license": "MIT",
   "type": "replugged-plugin",
